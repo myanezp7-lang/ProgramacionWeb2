@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Tienda de Comercio Electrónico</title>
+  </head>
+  <body>
+    <div id="cliente-gate" class="cliente-gate" role="dialog" aria-modal="true" aria-labelledby="cliente-gate-title">
+      <div class="cliente-gate-content">
+        <h2 id="cliente-gate-title">Selecciona tu usuario</h2>
+        <p>Selecciona un cliente existente para continuar o crea uno nuevo.</p>
+        <form id="cliente-gate-form" class="cliente-gate-form">
+          <input type="hidden" id="cliente-gate-token" name="csrf_token" />
+          <label for="cliente-gate-select">Usuario</label>
+          <select id="cliente-gate-select" name="cliente_id" required>
+            <option value="">Selecciona un cliente</option>
+          </select>
+          <button type="submit" class="submit-data">Continuar</button>
+          <a href="registrar_cliente.php" class="new-client-link">Crear nuevo cliente</a>
+          <p id="cliente-gate-status" class="form-status" role="status"></p>
+        </form>
+      </div>
+    </div>
+    <main class="container">
+      <header class="header">
+        <h1>Tienda de Comercio Electrónico</h1>
+        <a href="carrito.php">Ver carrito de compra</a>
+        <nav class="management-links" aria-label="Gestión de datos">
+          <a href="registrar_producto.php">Registrar producto</a>
+          <a href="registrar_cliente.php">Registrar cliente</a>
+          <a href="comprar.php">Registrar compra</a>
+          <a href="consulta_compras_cliente.php">Consulta de compras</a>
+          <form method="POST" action="cerrar_sesion.php" class="logout-form">
+            <input type="hidden" name="csrf_token" />
+            <button type="submit" class="logout-button">Cerrar sesión</button>
+          </form>
+        </nav>
+      </header>
+
+      <div class="shop-layout">
+        <section class="catalog-panel" aria-label="Catálogo de productos">
+          <section class="filters">
+            <input
+              type="text"
+              id="product-search"
+              placeholder="Buscar producto por nombre o descripción"
+              aria-label="Buscar producto"
+            />
+
+            <select id="category-filter" aria-label="Filtrar por categoría">
+              <option value="all">Todas las categorías</option>
+              <option value="Tecnología">Tecnología</option>
+              <option value="Hogar">Hogar</option>
+              <option value="Ropa">Ropa</option>
+              <option value="Deportes">Deportes</option>
+            </select>
+
+            <button id="clear-filters" type="button">Limpiar filtros</button>
+          </section>
+
+          <p id="catalog-status" class="form-status" role="status" aria-live="polite">
+            Consultando disponibilidad...
+          </p>
+          <section id="results-container" class="products-grid" aria-live="polite"></section>
+        </section>
+
+        <aside class="order-panel" aria-labelledby="pedido-title">
+          <h2 id="pedido-title">Pedido</h2>
+
+          <div id="selected-product-summary" class="selected-product-summary empty">
+            Selecciona un producto para iniciar tu pedido.
+          </div>
+
+          <div id="selected-client-summary" class="selected-client-summary">
+            Usuario: cargando...
+          </div>
+
+          <form id="pedido-form" class="pedido-form" method="POST" action="Pedido.php">
+            <input type="hidden" id="selected-product-id" name="selectedProductId" />
+            <input type="hidden" name="csrf_token" />
+
+            <div class="form-row">
+              <label for="descripcion-pedido">Descripción del pedido</label>
+              <input id="descripcion-pedido" type="text" name="descripcionPedido" placeholder="Ej: Compra de producto" required />
+            </div>
+
+            <div class="form-row">
+              <label for="tipo-pedido">Tipo de pedido</label>
+              <select id="tipo-pedido" name="tipoPedido" required>
+                <option value="">Seleccione</option>
+                <option value="Compra">Compra</option>
+                <option value="Venta">Venta</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <label for="producto-pedido">Producto</label>
+              <input id="producto-pedido" type="text" name="producto" readonly required />
+            </div>
+
+            <div class="form-row">
+              <label for="unidades-pedido">Cantidad</label>
+              <input id="unidades-pedido" type="number" min="1" name="unidades" placeholder="Ej: 2" required />
+            </div>
+
+            <div class="form-row">
+              <label for="observaciones-pedido">Observaciones</label>
+              <textarea id="observaciones-pedido" name="observaciones" rows="3" placeholder="Indicaciones adicionales..."></textarea>
+            </div>
+
+            <p id="pedido-status" class="form-status" role="status" aria-live="polite"></p>
+            <button type="submit" class="submit-pedido">Confirmar pedido</button>
+          </form>
+        </aside>
+      </div>
+
+      <section class="reviews-section" aria-labelledby="reviews-title">
+        <h2 id="reviews-title">Deja tu reseña</h2>
+        <form class="review-form" method="POST" action="procesar_resena.php">
+          <input type="hidden" name="csrf_token" />
+          <div class="form-row">
+            <label for="product_id">Producto comprado</label>
+            <select id="product_id" name="product_id" required>
+              <option value="">Selecciona un producto</option>
+              <option value="1">Laptop Lenovo IdeaPad</option>
+              <option value="2">Smartphone Samsung Galaxy</option>
+              <option value="3">Sofá Moderno</option>
+              <option value="4">Set de Toallas</option>
+              <option value="5">Camisa de algodón</option>
+              <option value="6">Balón de fútbol</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="rating">Calificación</label>
+            <select id="rating" name="rating" required>
+              <option value="">Selecciona una calificación</option>
+              <option value="5">5 - Excelente</option>
+              <option value="4">4 - Muy bueno</option>
+              <option value="3">3 - Bueno</option>
+              <option value="2">2 - Regular</option>
+              <option value="1">1 - Malo</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label for="comment">Comentario</label>
+            <textarea
+              id="comment"
+              name="comment"
+              rows="4"
+              maxlength="500"
+              placeholder="Cuéntanos tu experiencia con el producto..."
+              required
+            ></textarea>
+          </div>
+
+          <button type="submit" class="submit-review">Enviar reseña</button>
+        </form>
+      </section>
+
+    </main>
+
+    <script>
+      let products = [];
+      const productFallback = [
+        {
+          id: 1,
+          nombre: 'Laptop Lenovo IdeaPad',
+          categoria: 'Tecnología',
+          precio: 799000,
+          descripcion: 'Portátil ligera para trabajo y estudio.',
+          stock: 5
+        },
+        {
+          id: 2,
+          nombre: 'Smartphone Samsung Galaxy',
+          categoria: 'Tecnología',
+          precio: 540000,
+          descripcion: 'Teléfono con cámara de alta resolución.',
+          stock: 12
+        },
+        {
+          id: 3,
+          nombre: 'Sofá Moderno',
+          categoria: 'Hogar',
+          precio: 420000,
+          descripcion: 'Sofá cómodo para sala de estar.',
+          stock: 3
+        },
+        {
+          id: 4,
+          nombre: 'Set de Toallas',
+          categoria: 'Hogar',
+          precio: 28000,
+          descripcion: 'Paquete de toallas suaves y absorbentes.',
+          stock: 20
+        },
+        {
+          id: 5,
+          nombre: 'Camisa de algodón',
+          categoria: 'Ropa',
+          precio: 25000,
+          descripcion: 'Camisa cómoda para uso diario.',
+          stock: 15
+        },
+        {
+          id: 6,
+          nombre: 'Balón de fútbol',
+          categoria: 'Deportes',
+          precio: 32000,
+          descripcion: 'Balón oficial para entrenamiento y partidos.',
+          stock: 9
+        }
+      ];
+
+      const searchInput = document.getElementById('product-search');
+      const categoryFilter = document.getElementById('category-filter');
+      const clearBtn = document.getElementById('clear-filters');
+      const resultsContainer = document.getElementById('results-container');
+      const catalogStatus = document.getElementById('catalog-status');
+      const pedidoForm = document.getElementById('pedido-form');
+      const selectedProductSummary = document.getElementById('selected-product-summary');
+      const selectedClientSummary = document.getElementById('selected-client-summary');
+      const selectedProductIdInput = document.getElementById('selected-product-id');
+      const productoPedidoInput = document.getElementById('producto-pedido');
+      const descripcionPedidoInput = document.getElementById('descripcion-pedido');
+      const unidadesPedidoInput = document.getElementById('unidades-pedido');
+      const tipoPedidoInput = document.getElementById('tipo-pedido');
+      const observacionesPedidoInput = document.getElementById('observaciones-pedido');
+      const pedidoStatus = document.getElementById('pedido-status');
+      const forms = document.querySelectorAll('form[method="POST"]');
+      const clienteGate = document.getElementById('cliente-gate');
+      const clienteGateForm = document.getElementById('cliente-gate-form');
+      const clienteGateToken = document.getElementById('cliente-gate-token');
+      const clienteGateSelect = document.getElementById('cliente-gate-select');
+      const clienteGateStatus = document.getElementById('cliente-gate-status');
+
+      let selectedProduct = null;
+
+      fetch('csrf.php', { credentials: 'same-origin' })
+        .then((response) => response.json())
+        .then(({ token }) => {
+          forms.forEach((form) => {
+            form.querySelector('input[name="csrf_token"]').value = token;
+          });
+          clienteGateToken.value = token;
+        })
+        .catch(() => {
+          clienteGateStatus.textContent = 'No se pudo iniciar la sesión.';
+        });
+
+      fetch('cliente_sesion.php', { credentials: 'same-origin' })
+        .then((response) => {
+          if (!response.ok) throw new Error('No se pudieron cargar los clientes.');
+          return response.json();
+        })
+        .then(({ clientes, cliente_id, cliente_actual }) => {
+          clientes.forEach((cliente) => {
+            const option = document.createElement('option');
+            option.value = cliente.id_cliente;
+            option.textContent = `${cliente.nombre} - ${cliente.email}`;
+            clienteGateSelect.appendChild(option);
+          });
+
+          if (cliente_id) {
+            clienteGateSelect.value = cliente_id;
+            clienteGate.hidden = true;
+          }
+
+          if (cliente_actual) {
+            selectedClientSummary.textContent = `Usuario: ${cliente_actual.nombre} (${cliente_actual.email})`;
+          }
+        })
+        .catch(() => {
+          clienteGateStatus.textContent = 'No se pudieron cargar los clientes. Revisa XAMPP.';
+        });
+
+      clienteGateForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        clienteGateStatus.textContent = 'Guardando selección...';
+
+        fetch('cliente_sesion.php', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(new FormData(clienteGateForm))
+        })
+          .then((response) => response.json().then((data) => ({ ok: response.ok, data })))
+          .then(({ ok, data }) => {
+            if (!ok) throw new Error(data.error || 'No se pudo seleccionar el cliente.');
+            clienteGate.hidden = true;
+            selectedClientSummary.textContent = `Usuario: ${data.cliente.nombre} (${data.cliente.email})`;
+          })
+          .catch((error) => {
+            clienteGateStatus.textContent = error.message;
+          });
+      });
+
+      fetch('productos_disponibles.php', { credentials: 'same-origin' })
+        .then((response) => {
+          if (!response.ok) throw new Error('No se pudo consultar el catálogo.');
+          return response.json();
+        })
+        .then((productosBD) => {
+          products = productosBD.map((product) => ({
+            ...product,
+            id: Number(product.id_producto),
+            precio: Number(product.precio),
+            stock: Number(product.stock),
+            nombre: product.nombre,
+            descripcion: product.descripcion,
+            categoria: 'Catálogo'
+          }));
+          catalogStatus.textContent = 'Disponibilidad actualizada desde la base de datos.';
+          renderProducts();
+        })
+        .catch(() => {
+          products = productFallback;
+          catalogStatus.textContent = 'No se pudo consultar MySQL. Se muestran datos de referencia.';
+          renderProducts();
+        });
+
+      fetch('csrf.php', { credentials: 'same-origin' })
+        .then((response) => {
+          if (!response.ok) throw new Error('No se pudo obtener el token de seguridad.');
+          return response.json();
+        })
+        .then(({ token }) => {
+          forms.forEach((form) => {
+            form.querySelector('input[name="csrf_token"]').value = token;
+          });
+          pedidoStatus.textContent = '';
+        })
+        .catch(() => {
+          forms.forEach((form) => {
+            form.querySelector('button[type="submit"]').disabled = true;
+          });
+          pedidoStatus.textContent = 'No se pudo conectar con PHP. Abre este proyecto desde un servidor PHP (por ejemplo, XAMPP) y no mediante doble clic o Live Server.';
+        });
+
+      function formatPrice(value) {
+        return new Intl.NumberFormat('es-CL', {
+          style: 'currency',
+          currency: 'CLP'
+        }).format(value);
+      }
+
+      function renderProducts() {
+        const searchTerm = searchInput.value.trim().toLowerCase();
+        const selectedCategory = categoryFilter.value;
+
+        const filteredProducts = products.filter((product) => {
+          const matchesSearch =
+            product.nombre.toLowerCase().includes(searchTerm) ||
+            product.descripcion.toLowerCase().includes(searchTerm);
+
+          const matchesCategory =
+            selectedCategory === 'all' || product.categoria === selectedCategory;
+
+          return matchesSearch && matchesCategory;
+        });
+
+        if (filteredProducts.length === 0) {
+          resultsContainer.innerHTML = '<p class="no-results">No se encontraron productos con los criterios seleccionados.</p>';
+          return;
+        }
+
+        resultsContainer.innerHTML = filteredProducts
+          .map(
+            (product) => `
+              <article class="product-card" data-id="${product.id}">
+                <div class="product-image">${product.nombre.charAt(0)}</div>
+                <span class="category">${product.categoria}</span>
+                <h2>${product.nombre}</h2>
+                <p>${product.descripcion}</p>
+                <div class="product-footer">
+                  <strong>${formatPrice(product.precio)}</strong>
+                  <span class="${product.stock > 0 ? 'available' : 'unavailable'}">
+                    ${product.stock > 0 ? `Disponible: ${product.stock}` : 'Agotado'}
+                  </span>
+                </div>
+                <button class="select-product-btn" type="button" data-id="${product.id}" ${product.stock < 1 ? 'disabled' : ''}>
+                  ${product.stock > 0 ? 'Solicitar' : 'Agotado'}
+                </button>
+              </article>
+            `
+          )
+          .join('');
+      }
+
+      function setSelectedProduct(product) {
+        selectedProduct = product;
+        selectedProductIdInput.value = product.id;
+        productoPedidoInput.value = product.nombre;
+        descripcionPedidoInput.value = `Pedido de ${product.nombre}`;
+        tipoPedidoInput.value = 'Compra';
+        unidadesPedidoInput.value = 1;
+        observacionesPedidoInput.value = '';
+
+        selectedProductSummary.classList.remove('empty');
+        selectedProductSummary.innerHTML = `
+          <strong>${product.nombre}</strong>
+          <span>${product.categoria}</span><br>
+          <span>Precio: ${formatPrice(product.precio)}</span><br>
+          <span>Stock disponible: ${product.stock}</span>
+        `;
+
+        pedidoForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        descripcionPedidoInput.focus();
+      }
+
+      resultsContainer.addEventListener('click', (event) => {
+        const button = event.target.closest('.select-product-btn');
+        if (!button) return;
+
+        const productId = Number(button.dataset.id);
+        const product = products.find((item) => item.id === productId);
+
+        if (product) {
+          setSelectedProduct(product);
+        }
+      });
+
+      pedidoForm.addEventListener('submit', (event) => {
+        if (!selectedProduct) {
+          event.preventDefault();
+          alert('Debes seleccionar un producto primero.');
+          return;
+        }
+
+        const pedido = {
+          descripcionPedido: descripcionPedidoInput.value,
+          tipoPedido: tipoPedidoInput.value,
+          producto: productoPedidoInput.value,
+          unidades: Number(unidadesPedidoInput.value),
+          observaciones: observacionesPedidoInput.value
+        };
+
+        console.log('Pedido registrado:', pedido);
+      });
+
+      searchInput.addEventListener('input', renderProducts);
+      categoryFilter.addEventListener('change', renderProducts);
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        categoryFilter.value = 'all';
+        renderProducts();
+      });
+
+      renderProducts();
+    </script>
+  </body>
+</html>
